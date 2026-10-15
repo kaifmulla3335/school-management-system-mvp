@@ -1,0 +1,26 @@
+-- Run once against the existing Stud_db. Additive changes; existing rows are retained.
+BEGIN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(80);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'student';
+ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS ix_users_username ON users (username);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS class_name VARCHAR(50);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS roll_number VARCHAR(30);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS user_id INTEGER;
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS admission_number VARCHAR(40);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS section VARCHAR(10);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS gender VARCHAR(20);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS guardian_name VARCHAR(100);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS guardian_phone VARCHAR(20);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS address VARCHAR(500);
+ALTER TABLE stud ADD COLUMN IF NOT EXISTS admission_date DATE;
+ALTER TABLE stud ALTER COLUMN email DROP NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS ix_stud_user_id ON stud (user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ix_stud_admission_number ON stud (admission_number);
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_stud_user_id') THEN
+        ALTER TABLE stud ADD CONSTRAINT fk_stud_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
+    END IF;
+END $$;
+COMMIT;
