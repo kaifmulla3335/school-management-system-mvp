@@ -1,10 +1,13 @@
 """Promote an existing email account, or create the first admin offline."""
 import os
+import sys
+
+# Add backend folder to path so 'app' module can be imported
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy import text
 from pwdlib import PasswordHash
-
-from database import engine
+from app.db.database import engine
 
 email = os.environ.get("BOOTSTRAP_ADMIN_EMAIL", "").strip().lower()
 if not email:

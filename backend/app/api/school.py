@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 import re
 import unicodedata
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from auth import get_current_user, password_hash, require_admin
-from database import get_db
-from models import Attendance, Homework, Mark, Student, User
-from schemas import (
+from app.core.security import get_current_user, password_hash, require_admin
+from app.db.database import get_db
+from app.db.models import Attendance, Homework, Mark, Student, User
+from app.schemas import (
     AttendanceResponse, AttendanceWrite, HomeworkResponse, HomeworkWrite,
     MarkResponse, MarkWrite, RoleUpdate, StudentAccountCreate, StudentPasswordReset,
     StudentResponse, UserResponse,
@@ -47,7 +47,6 @@ def existing_student(db: Session, student_id: int) -> Student:
 @router.post("/admin/student-accounts", response_model=StudentResponse, status_code=201)
 def create_student_account(data: StudentAccountCreate, db: Session = Depends(get_db), admin: User = Depends(require_admin)):
     year = data.admission_date.year
-    # Serialize admission numbers and name-based login IDs on PostgreSQL.
     if db.bind.dialect.name == "postgresql":
         db.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": 2026001})
     numbers = db.query(Student.admission_number).filter(Student.admission_number.like(f"{year}-%")).all()

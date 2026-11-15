@@ -1,4 +1,3 @@
-
 from datetime import date
 from typing import Literal
 from pydantic import BaseModel, EmailStr, ConfigDict, Field, model_validator
