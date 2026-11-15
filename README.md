@@ -1,56 +1,139 @@
-# School Management System MVP
+Bhai, samajh gaya. Aapko ek hi code block mein poora `README.md` chahiye, taaki copy-paste mein dikkat na ho.
 
-A work-in-progress school portal for classes 1 to 10, built with React, Vite, FastAPI, PostgreSQL, SQLAlchemy, and JWT authentication. This repository captures the current MVP; attendance, marks, fees, and homework screens are planned for later development.
+Yahan aapki **final, complete, aur professional `README.md`** file hai. Ise copy karein aur GitHub par (ya VS Code mein direct) replace kar dein:
 
-## Current features
+```markdown
+# School Management System
 
-- Admin and student roles with backend permission checks
-- Admin dashboard with class counts and a filterable student roster
-- Student creation with school and guardian details
-- Automatic admission number (`2026-001` format) and separate login ID based on name and birth year (`aaravmehta2019` format)
-- Admin password reset for students; passwords stored as Argon2 hashes
-- Student login and a dashboard limited to the student's own profile
-- Responsive sidebar with a mobile menu
+A full-stack web application designed to streamline school administration and student management. The system provides role-based access control for Administrators and Students, allowing for efficient management of student records, profiles, and school data.
 
-The backend also has attendance, marks, and homework endpoints. Their frontend management screens are **not implemented yet**. This project is not deployed; it currently runs locally.
+## 🚀 Tech Stack
 
-## Run locally
+**Backend:**
+*   Python (FastAPI)
+*   PostgreSQL (Database)
+*   SQLAlchemy (ORM)
+*   JWT (Authentication)
+*   Pydantic (Data Validation)
+*   Argon2 (Password Hashing)
 
-Requirements: Python 3.11+, Node.js, and PostgreSQL. Create a PostgreSQL database, then set the variables shown in [.env.example](.env.example) in your terminal or local environment. Never commit real credentials. The frontend expects the API at `http://localhost:8000` and runs at `http://localhost:5173`.
+**Frontend:**
+*   React (Vite)
+*   Tailwind CSS (Styling)
+*   React Router (Routing)
+*   Axios (API Requests)
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-# For a fresh empty database, create the current schema:
-python -c "from database import Base, engine; import models; Base.metadata.create_all(bind=engine)"
-python -m uvicorn main:app --reload
+## ✨ Features
+
+*   **Role-Based Access Control:** Secure dashboards for Admin and Student roles.
+*   **Admin Dashboard:** Overview of total students, class distributions, and a filterable student roster.
+*   **Student Management:** Admins can create student accounts, auto-generate admission numbers, and manage profiles.
+*   **Student Dashboard:** Students can view their personal profile, admission details, and guardian information.
+*   **Secure Authentication:** JWT-based login system with Argon2 password hashing.
+*   **Auto-Generated Credentials:** Unique login IDs generated from student names and birth years.
+*   **Responsive UI:** Clean and modern interface built with Tailwind CSS.
+
+## 📁 Project Structure
+
+The project follows a clean, layered architecture for scalability and maintainability:
+
+```text
+school-management-system/
+│
+├── backend/                  # FastAPI Backend
+│   ├── app/
+│   │   ├── api/              # API Routes (auth, students, school)
+│   │   ├── core/             # Security & Dependencies
+│   │   ├── db/               # Database configuration & models
+│   │   ├── schemas/          # Pydantic schemas
+│   │   ├── services/         # Business logic & Repositories
+│   │   ├── config.py         # Environment variables
+│   │   └── main.py           # Application entry point
+│   ├── scripts/              # Utility scripts (bootstrap admin, migrations)
+│   ├── .env.example          # Environment variables template
+│   └── requirements.txt      # Python dependencies
+│
+├── frontend/                 # React Frontend
+│   ├── src/
+│   │   ├── api/              # Axios API call configurations
+│   │   ├── components/       # Reusable UI components (Sidebar, etc.)
+│   │   ├── context/          # Global state (AuthContext)
+│   │   ├── pages/            # Application screens
+│   │   ├── routes/           # Protected routes logic
+│   │   ├── App.jsx           # Route definitions
+│   │   └── main.jsx          # React entry point
+│   └── package.json          # Frontend dependencies
+│
+├── migration_school.sql      # Database schema migration
+└── README.md
 ```
 
-In another terminal:
+## 🛠️ Local Setup Instructions
 
-```powershell
+### Prerequisites
+*   Python 3.10+
+*   Node.js & npm
+*   PostgreSQL installed and running
+
+### 1. Backend Setup
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd school-management-system
+
+# Create and activate virtual environment
+python -m venv .venv
+# On Windows:
+.\.venv\Scripts\activate
+# On Mac/Linux:
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Setup environment variables
+# Rename backend/.env.example to backend/.env and fill in your PostgreSQL credentials and JWT secret.
+
+# Create the first Admin account
+# Set environment variables in terminal (PowerShell):
+# $env:BOOTSTRAP_ADMIN_EMAIL="admin@school.com"
+# $env:BOOTSTRAP_ADMIN_PASSWORD="your_secure_password"
+# python backend/scripts/bootstrap_admin.py
+
+# Start the backend server
+cd backend
+uvicorn app.main:app --reload
+```
+*(Backend will run at `http://localhost:8000`)*
+
+### 2. Frontend Setup
+```bash
+# Open a new terminal
 cd frontend
+
+# Install dependencies
 npm install
+
+# Start the development server
 npm run dev
 ```
+*(Frontend will run at `http://localhost:5173`)*
 
-If upgrading an older database with `users` and `stud` tables, run `python migrate_school.py` instead of the fresh database schema command. The migration adds school columns without dropping existing student records. Neither path creates an admin account. To create the first admin, set `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` in your local terminal, then run `python bootstrap_admin.py`. The bootstrap script hashes the password and does not publish it in source code. Existing accounts can be promoted using the same script. This bootstrap admin signs in using the configured email; the local demo database has a separate `admin` username. See [SCHOOL_MVP.md](SCHOOL_MVP.md) for more context.
-
-## Verification
-
-```powershell
-cd frontend
-npm run build
+## 🔒 Security Note
+*   Passwords are securely hashed using Argon2.
+*   `.env` files are excluded from version control to prevent credential leaks.
+*   API routes are protected by JWT authentication and role-based dependencies.
+*   No real student data or local database credentials belong in this repository.
 ```
 
-For the isolated backend check, run `python -m unittest test_school_mvp -v` with `DATABASE_URL=sqlite+pysqlite:///:memory:` in the environment. It does not touch PostgreSQL.
+---
 
-## Roadmap
+### 🚀 Ab Push Karein
 
-- Admin and student views for attendance and subject marks
-- Homework and fees workflows
-- Safer first-login password change and account recovery
-- Managed database migrations and deployment
+1. GitHub par file update karke commit kar dein.
+2. Apne VS Code ke terminal mein (root folder mein) ye command chalayein taaki local file bhi sync ho jaye:
+   ```powershell
+   git pull origin main
+   ```
 
-No real student data or local database credentials belong in this repository.
+Aap ye kar lein. Ab hum **Attendance aur Marks** ke frontend features banana shuru karte hain. Batayein kaunsa feature pehle banayein? 🚀
