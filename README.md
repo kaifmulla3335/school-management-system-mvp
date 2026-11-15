@@ -1,139 +1,160 @@
-Bhai, samajh gaya. Aapko ek hi code block mein poora `README.md` chahiye, taaki copy-paste mein dikkat na ho.
+# School Management System (MVP)
 
-Yahan aapki **final, complete, aur professional `README.md`** file hai. Ise copy karein aur GitHub par (ya VS Code mein direct) replace kar dein:
+A school portal for classes 1 to 10. Backend: **FastAPI + PostgreSQL + SQLAlchemy + JWT (Argon2 password hashing)**. Frontend: **React + Vite + Tailwind CSS + React Router**.
 
-```markdown
-# School Management System
+> Status: work in progress, runs locally only (not deployed).
 
-A full-stack web application designed to streamline school administration and student management. The system provides role-based access control for Administrators and Students, allowing for efficient management of student records, profiles, and school data.
+## Features
 
-## 🚀 Tech Stack
+**Working now**
+- Admin and student roles, enforced on the backend
+- Login with a school login ID (students) or email (admin)
+- Admin: view all students, add a student account in one step
+- Automatic admission number (`2026-001`) and login ID from name + birth year (`aaravmehta2019`)
+- Student dashboard showing only the student's own profile
+- Backend APIs for attendance, marks, homework, role change and password reset (no frontend screens for these yet)
 
-**Backend:**
-*   Python (FastAPI)
-*   PostgreSQL (Database)
-*   SQLAlchemy (ORM)
-*   JWT (Authentication)
-*   Pydantic (Data Validation)
-*   Argon2 (Password Hashing)
+**Planned / not in the UI yet**
+- Delete student and reset password screens (APIs already exist)
+- Class-wise filter on the admin dashboard
+- Attendance, marks, homework and fees screens
 
-**Frontend:**
-*   React (Vite)
-*   Tailwind CSS (Styling)
-*   React Router (Routing)
-*   Axios (API Requests)
+## Project structure
 
-## ✨ Features
-
-*   **Role-Based Access Control:** Secure dashboards for Admin and Student roles.
-*   **Admin Dashboard:** Overview of total students, class distributions, and a filterable student roster.
-*   **Student Management:** Admins can create student accounts, auto-generate admission numbers, and manage profiles.
-*   **Student Dashboard:** Students can view their personal profile, admission details, and guardian information.
-*   **Secure Authentication:** JWT-based login system with Argon2 password hashing.
-*   **Auto-Generated Credentials:** Unique login IDs generated from student names and birth years.
-*   **Responsive UI:** Clean and modern interface built with Tailwind CSS.
-
-## 📁 Project Structure
-
-The project follows a clean, layered architecture for scalability and maintainability:
-
-```text
+```
 school-management-system/
-│
-├── backend/                  # FastAPI Backend
+├── backend/
 │   ├── app/
-│   │   ├── api/              # API Routes (auth, students, school)
-│   │   ├── core/             # Security & Dependencies
-│   │   ├── db/               # Database configuration & models
-│   │   ├── schemas/          # Pydantic schemas
-│   │   ├── services/         # Business logic & Repositories
-│   │   ├── config.py         # Environment variables
-│   │   └── main.py           # Application entry point
-│   ├── scripts/              # Utility scripts (bootstrap admin, migrations)
-│   ├── .env.example          # Environment variables template
-│   └── requirements.txt      # Python dependencies
-│
-├── frontend/                 # React Frontend
+│   │   ├── main.py              # FastAPI app, CORS, router registration
+│   │   ├── config.py            # Reads .env (DATABASE_URL, JWT_SECRET, ...)
+│   │   ├── api/                 # Routes: auth.py, students.py, school.py
+│   │   ├── core/security.py     # JWT, password hash, get_current_user, require_admin
+│   │   ├── db/                  # database.py (engine, session), models.py (tables)
+│   │   ├── schemas/             # Pydantic request/response models
+│   │   └── services/            # services.py (logic), repository.py (queries)
+│   ├── scripts/bootstrap_admin.py
+│   ├── .env.example
+│   └── requirements.txt
+├── frontend/
 │   ├── src/
-│   │   ├── api/              # Axios API call configurations
-│   │   ├── components/       # Reusable UI components (Sidebar, etc.)
-│   │   ├── context/          # Global state (AuthContext)
-│   │   ├── pages/            # Application screens
-│   │   ├── routes/           # Protected routes logic
-│   │   ├── App.jsx           # Route definitions
-│   │   └── main.jsx          # React entry point
-│   └── package.json          # Frontend dependencies
-│
-├── migration_school.sql      # Database schema migration
+│   │   ├── App.jsx              # Routes
+│   │   ├── api/                 # axios.js, auth.js, students.js
+│   │   ├── context/AuthContext.jsx
+│   │   ├── routes/ProtectedRoute.jsx
+│   │   ├── components/Sidebar.jsx
+│   │   └── pages/               # Login, AdminDashboard, AddStudent, StudentDashboard
+│   ├── vite.config.js
+│   └── package.json
+├── migration_school.sql         # Only for upgrading an OLD database
+├── SCHOOL_MVP.md
 └── README.md
 ```
 
-## 🛠️ Local Setup Instructions
+Frontend routes: `/` (login), `/admin`, `/admin/add-student`, `/student`.
 
-### Prerequisites
-*   Python 3.10+
-*   Node.js & npm
-*   PostgreSQL installed and running
+## Requirements
 
-### 1. Backend Setup
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd school-management-system
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL (create an empty database first)
 
-# Create and activate virtual environment
-python -m venv .venv
-# On Windows:
-.\.venv\Scripts\activate
-# On Mac/Linux:
-source .venv/bin/activate
+## Run locally
 
-# Install dependencies
-pip install -r backend/requirements.txt
+### 1. Backend
 
-# Setup environment variables
-# Rename backend/.env.example to backend/.env and fill in your PostgreSQL credentials and JWT secret.
-
-# Create the first Admin account
-# Set environment variables in terminal (PowerShell):
-# $env:BOOTSTRAP_ADMIN_EMAIL="admin@school.com"
-# $env:BOOTSTRAP_ADMIN_PASSWORD="your_secure_password"
-# python backend/scripts/bootstrap_admin.py
-
-# Start the backend server
+```powershell
 cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+copy .env.example .env                # macOS/Linux: cp .env.example .env
+```
+
+Edit `backend/.env`:
+
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | e.g. `postgresql+psycopg://USER:PASSWORD@localhost:5432/DATABASE` |
+| `JWT_SECRET` | Long random string. Generate: `python -c "import secrets; print(secrets.token_urlsafe(48))"` |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Optional, default `30` |
+
+Start the API (run from the `backend/` folder):
+
+```powershell
 uvicorn app.main:app --reload
 ```
-*(Backend will run at `http://localhost:8000`)*
 
-### 2. Frontend Setup
+- API: http://localhost:8000
+- Interactive docs: http://localhost:8000/docs
+
+Tables are created automatically on startup for a fresh database.
+
+### 2. Create the first admin
+
+```powershell
+# still inside backend/
+$env:BOOTSTRAP_ADMIN_EMAIL="admin@example.com"
+$env:BOOTSTRAP_ADMIN_PASSWORD="choose-a-strong-password"
+python scripts/bootstrap_admin.py
+```
+
+macOS/Linux:
+
 ```bash
-# Open a new terminal
+BOOTSTRAP_ADMIN_EMAIL=admin@example.com BOOTSTRAP_ADMIN_PASSWORD=choose-a-strong-password python scripts/bootstrap_admin.py
+```
+
+If an account with that email already exists it is promoted to admin. Otherwise a new admin is created. Log in on the website with that email and password.
+
+### 3. Frontend
+
+```powershell
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the development server
 npm run dev
 ```
-*(Frontend will run at `http://localhost:5173`)*
 
-## 🔒 Security Note
-*   Passwords are securely hashed using Argon2.
-*   `.env` files are excluded from version control to prevent credential leaks.
-*   API routes are protected by JWT authentication and role-based dependencies.
-*   No real student data or local database credentials belong in this repository.
+Open http://localhost:5173. The frontend expects the API at `http://localhost:8000`, and the backend only allows requests from `http://localhost:5173`.
+
+## Upgrading an old database
+
+Only if you already have `users` and `stud` tables from the first version. This adds the school columns and keeps existing rows. Run it once from the project root:
+
+```bash
+psql -U USER -d DATABASE -f migration_school.sql
 ```
 
----
+## Build check
 
-### 🚀 Ab Push Karein
+```powershell
+cd frontend
+npm run build
+```
 
-1. GitHub par file update karke commit kar dein.
-2. Apne VS Code ke terminal mein (root folder mein) ye command chalayein taaki local file bhi sync ho jaye:
-   ```powershell
-   git pull origin main
-   ```
+## API overview
 
-Aap ye kar lein. Ab hum **Attendance aur Marks** ke frontend features banana shuru karte hain. Batayein kaunsa feature pehle banayein? 🚀
+| Method | Path | Who | Purpose |
+|---|---|---|---|
+| POST | `/auth/login` | public | Get access token |
+| GET | `/auth/me` | logged in | Current user |
+| GET, POST | `/students` | admin | List / create student |
+| GET, PUT, DELETE | `/students/{id}` | admin | Read / update / delete |
+| POST | `/admin/student-accounts` | admin | Create student + login |
+| PUT | `/admin/students/{id}/password` | admin | Reset student password |
+| GET | `/admin/students/{id}/school` | admin | Student's full school record |
+| GET | `/admin/users` | admin | List users |
+| PUT | `/admin/users/{id}/role` | admin | Change role |
+| PUT | `/admin/attendance` | admin | Save attendance |
+| PUT | `/admin/marks` | admin | Save marks |
+| POST | `/admin/homework` | admin | Add homework |
+| GET | `/student/dashboard` | student | Own profile and records |
+
+Full details are at `/docs` while the server is running.
+
+## Security notes
+
+- Never commit `.env` or real credentials (already in `.gitignore`).
+- Passwords are stored only as Argon2 hashes. Initial passwords must be shared with students manually.
+- Use a long random `JWT_SECRET` and back up the database before running migrations on real data.
+
+See [SCHOOL_MVP.md](SCHOOL_MVP.md) for more product context.
